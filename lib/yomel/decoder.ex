@@ -48,12 +48,11 @@ defmodule Yomel.Decoder do
     end
   end
 
-  defp do_decode(yaml = %Y{events: [{:sequence_start, anchor, tag, _style} | rest],
-                           anchors: anchors}) do
-    {seq, yaml} = decode_seq(%Y{yaml | events: rest}, tag)
+  defp do_decode(yaml = %Y{events: [{:sequence_start, _anchor, tag, _style} | rest]}) do
+    decode_seq(%Y{yaml | events: rest}, tag)
   end
 
-  defp do_decode(yaml = %Y{events: [{:scalar, value, tag, anchor, _style} | rest]}) do
+  defp do_decode(yaml = %Y{events: [{:scalar, value, _tag, _anchor, _style} | rest]}) do
     {value, %Y{yaml | events: rest}}
   end
 
@@ -65,9 +64,9 @@ defmodule Yomel.Decoder do
     {:doc_end, %Y{yaml | events: rest}}
   end
 
-  defp do_decode(yaml = %Y{events: [:stream_end]}), do: :halt
+  defp do_decode(%Y{events: [:stream_end]}), do: :halt
 
-  defp decode_map(yaml, tag) do
+  defp decode_map(yaml, _tag) do
     do_decode_map(yaml, %{})
   end
 
@@ -75,7 +74,7 @@ defmodule Yomel.Decoder do
     {acc, %Y{yaml | events: rest}}
   end
 
-  defp do_decode_map(yaml = %Y{events: events}, acc) do
+  defp do_decode_map(yaml = %Y{}, acc) do
     {key, yaml} = do_decode(yaml)
     {val, yaml} = do_decode(yaml)
 
@@ -85,12 +84,12 @@ defmodule Yomel.Decoder do
     end
   end
 
-  defp decode_seq(yaml, tag) do
+  defp decode_seq(yaml, _tag) do
     do_decode_seq(yaml, [])
   end
 
   defp do_decode_seq(yaml = %Y{events: [:sequence_end | rest]}, acc) do
-    {acc, %Y{yaml | events: rest}}
+    {Enum.reverse(acc), %Y{yaml | events: rest}}
   end
 
   defp do_decode_seq(yaml, acc) do

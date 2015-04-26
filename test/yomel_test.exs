@@ -4,40 +4,67 @@ defmodule YomelTest do
   test "the truth" do
     input = """
     ---
-    receipt:     Oz-Ware Purchase Invoice
-
-    items:
-        - part_no:   A4786
-          descrip:   'Water Bucket (Filled)'
-          price:     1.47
-
-        - part_no:   E1628
-          quantity:  !!int 1
-
-    bill_to:  &id001
-        street: |
-                123 Tornado Alley
-                Suite 16
-        city:   East Centerville
-
-    ship_to:
-        <<:   *id001
-        city: Tokyo
-
-    specialDelivery:  >
-        Follow the Yellow Brick
-        Road to the Emerald City.
-        Pay no attention to the
-        man behind the curtain.
-    ...
+    invoice: 34843
+    date   : 2001-01-23
+    bill-to: &id001
+        given  : Chris
+        family : Dumars
+        address:
+            lines: |
+                458 Walkman Dr.
+                Suite #292
+            city    : Royal Oak
+            state   : MI
+            postal  : 48046
+    ship-to: *id001
+    product:
+        - sku         : BL394D
+          quantity    : 4
+          description : Basketball
+          price       : 450.00
+        - sku         : BL4438H
+          quantity    : 1
+          description : Super Hoop
+          price       : 2392.00
+    tax  : 251.42
+    total: 4443.52
+    comments: >
+        Late afternoon is best.
+        Backup contact is Nancy
+        Billsmer @ 338-4338.
     """
+    bill_to = %{
+      "given" => "Chris",
+      "family" => "Dumars",
+      "address" => %{
+        "lines" => "458 Walkman Dr.\nSuite #292\n",
+        "city" => "Royal Oak",
+        "state" => "MI",
+        "postal" => "48046"
+      }
+    }
 
-    events = Yomel.Parser.event_stream(input) |> Enum.to_list |> IO.inspect
+    expected = [%{
+      "invoice" => "34843",
+      "date" => "2001-01-23",
+      "bill-to" => bill_to,
+      "ship-to" => bill_to,
+      "product" => [
+        %{"sku"         => "BL394D",
+          "quantity"    => "4",
+          "description" => "Basketball",
+          "price"       => "450.00"},
+        %{"sku"         => "BL4438H",
+          "quantity"    => "1",
+          "description" => "Super Hoop",
+          "price"       => "2392.00"}],
+      "tax"  => "251.42",
+      "total" => "4443.52",
+      "comments" => "Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.\n"
+    }]
 
-    Yomel.Decoder.decode(events) |> IO.inspect
+    {:ok, yaml} = Yomel.decode(input)
 
-    assert is_list(events)
-    assert Enum.count(events) > 20
-    assert [:stream_start, :document_start | _] = events
+    assert yaml == expected
   end
 end
