@@ -39,6 +39,10 @@ defmodule Yomel.Decoder do
   @spec do_decode(%Y{}) :: {yaml_doc, %Y{}} | {:doc_end, %Y{}} | :halt
   defp do_decode(yaml)
 
+  defp do_decode(yaml = %Y{events: [:document_start | rest]}) do
+    do_decode(%Y{yaml | events: rest})
+  end
+
   defp do_decode(yaml = %Y{events: [{:mapping_start, anchor, tag, _} | rest],
                            anchors: anchors}) do
     {map, yaml} = decode_map(%Y{yaml | events: rest}, tag)
