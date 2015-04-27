@@ -9,10 +9,10 @@ defmodule ParserTest do
   end
 
   test "parsing sequence" do
-    actual = parse_and_unpack("- 1")
+    actual = parse_and_unpack("- a")
     expected = [
       {:sequence_start, nil, nil, :block},
-      {:scalar, "1", nil, nil, :plain},
+      {:scalar, "a", nil, nil, :plain},
       :sequence_end
     ]
     assert actual == expected
@@ -55,15 +55,15 @@ defmodule ParserTest do
     actual = parse_and_unpack("""
     ---
     key:
-      - 1
-      - 2
+      - a
+      - b
     """)
     expected = [
       {:mapping_start, nil, nil, :block},
       {:scalar, "key", nil, nil, :plain},
       {:sequence_start, nil, nil, :block},
-      {:scalar, "1", nil, nil, :plain},
-      {:scalar, "2", nil, nil, :plain},
+      {:scalar, "a", nil, nil, :plain},
+      {:scalar, "b", nil, nil, :plain},
       :sequence_end,
       :mapping_end
     ]

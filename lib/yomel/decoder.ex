@@ -24,19 +24,20 @@ defmodule Yomel.Decoder do
   @spec decode_document(%Y{}) :: [yaml_doc]
   defp decode_document(yaml), do: decode_document([], yaml)
 
-  defp decode_document(docs, %Y{events: [:stream_end]}), do: docs
+  defp decode_document(docs, %Y{events: [:stream_end]}) do
+    Enum.reverse docs
+  end
 
   defp decode_document(docs, yaml) do
     case do_decode(yaml) do
       {:doc_end, yaml} -> decode_document(docs, yaml)
       {doc, yaml} -> decode_document([doc | docs], yaml)
-      :halt -> Enum.reverse docs  # decoding finished
     end
   end
 
   @doc "decode a document"
   @doc false
-  @spec do_decode(%Y{}) :: {yaml_doc, %Y{}} | {:doc_end, %Y{}} | :halt
+  @spec do_decode(%Y{}) :: {yaml_doc, %Y{}} | {:doc_end, %Y{}}
   defp do_decode(yaml)
 
   defp do_decode(yaml = %Y{events: [:document_start | rest]}) do
@@ -67,8 +68,6 @@ defmodule Yomel.Decoder do
   defp do_decode(yaml = %Y{events: [:document_end | rest]}) do
     {:doc_end, %Y{yaml | events: rest}}
   end
-
-  defp do_decode(%Y{events: [:stream_end]}), do: :halt
 
   defp decode_map(yaml, _tag) do
     do_decode_map(yaml, %{})
