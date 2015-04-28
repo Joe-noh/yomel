@@ -33,6 +33,7 @@ defmodule YomelTest do
         Backup contact is Nancy
         Billsmer @ 338-4338.
     """
+
     bill_to = %{
       "given" => "Chris",
       "family" => "Dumars",
@@ -40,26 +41,26 @@ defmodule YomelTest do
         "lines" => "458 Walkman Dr.\nSuite #292\n",
         "city" => "Royal Oak",
         "state" => "MI",
-        "postal" => "48046"
+        "postal" => 48046
       }
     }
 
     expected = [%{
-      "invoice" => "34843",
+      "invoice" => 34843,
       "date" => "2001-01-23",
       "bill-to" => bill_to,
       "ship-to" => bill_to,
       "product" => [
         %{"sku"         => "BL394D",
-          "quantity"    => "4",
+          "quantity"    => 4,
           "description" => "Basketball",
-          "price"       => "450.00"},
+          "price"       => 450.00},
         %{"sku"         => "BL4438H",
-          "quantity"    => "1",
+          "quantity"    => 1,
           "description" => "Super Hoop",
-          "price"       => "2392.00"}],
-      "tax"  => "251.42",
-      "total" => "4443.52",
+          "price"       => 2392.00}],
+      "tax"  => 251.42,
+      "total" => 4443.52,
       "comments" => "Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.\n"
     }]
 
