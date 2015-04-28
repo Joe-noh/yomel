@@ -1,7 +1,7 @@
 defmodule YomelTest do
   use ExUnit.Case
 
-  test "the truth" do
+  test "parsing practical yaml" do
     input = """
     ---
     invoice: 34843
@@ -67,5 +67,11 @@ defmodule YomelTest do
     {:ok, yaml} = Yomel.decode(input)
 
     assert yaml == expected
+  end
+
+  test "parsing yaml file" do
+    {:ok, yaml} = Yomel.decode_file("test/yaml/hello.yaml")
+
+    assert yaml == ["hello"]
   end
 end
