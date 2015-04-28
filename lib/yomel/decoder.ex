@@ -4,6 +4,7 @@ defmodule Yomel.Decoder do
   end
 
   alias Yaml, as: Y
+  alias Yomel.TypeConverter, as: Converter
 
   @type yaml_doc :: term
   @type yaml_event :: term
@@ -58,7 +59,7 @@ defmodule Yomel.Decoder do
   end
 
   defp do_decode(yaml = %Y{events: [{:scalar, value, _anchor, tag, _style} | rest]}) do
-    {value, %Y{yaml | events: rest}}
+    {Converter.convert(value, tag), %Y{yaml | events: rest}}
   end
 
   defp do_decode(yaml = %Y{events: [{:alias, anchor} | rest], anchors: anchors}) do

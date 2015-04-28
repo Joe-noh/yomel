@@ -2,6 +2,56 @@ defmodule DecoderTest do
   use ExUnit.Case
   import TestHelper
 
+  test "decoding untagged scalar" do
+    events = pack [
+      {:scalar, "a", nil, nil, :plain}
+    ]
+    {:ok, actual} = Yomel.Decoder.decode(events)
+    expected = ["a"]
+
+    assert actual == expected
+  end
+
+  test "decoding int tagged scalar" do
+    events = pack [
+      {:scalar, "1", nil, "tag:yaml.org,2002:int", :plain}
+    ]
+    {:ok, actual} = Yomel.Decoder.decode(events)
+    expected = [1]
+
+    assert actual == expected
+  end
+
+  test "decoding str tagged scalar" do
+    events = pack [
+      {:scalar, "1", nil, "tag:yaml.org,2002:str", :plain}
+    ]
+    {:ok, actual} = Yomel.Decoder.decode(events)
+    expected = ["1"]
+
+    assert actual == expected
+  end
+
+  test "decoding float tagged float" do
+    events = pack [
+      {:scalar, "1.0", nil, "tag:yaml.org,2002:float", :plain}
+    ]
+    {:ok, actual} = Yomel.Decoder.decode(events)
+    expected = [1.0]
+
+    assert actual == expected
+  end
+
+  test "decoding float tagged integer" do
+    events = pack [
+      {:scalar, "1", nil, "tag:yaml.org,2002:float", :plain}
+    ]
+    {:ok, actual} = Yomel.Decoder.decode(events)
+    expected = [1.0]
+
+    assert actual == expected
+  end
+
   test "decoding sequence events" do
     events = pack [
       {:sequence_start, nil, nil, :block},
