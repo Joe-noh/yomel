@@ -44,7 +44,9 @@ static ERL_NIF_TERM yomel_parse_string(ErlNifEnv* env, int argc, const ERL_NIF_T
     int go_on_parsing = 1;
     ERL_NIF_TERM list = enif_make_list(env, 0);
     do {
-        yaml_parser_parse(&parser, &event);
+        if (!yaml_parser_parse(&parser, &event)) {
+            return list;
+        }
         list = enif_make_list_cell(env, handle_event(env, &event), list);
 
         if (event.type == YAML_STREAM_END_EVENT) {
@@ -157,8 +159,8 @@ static ERL_NIF_TERM handle_scalar_event(ErlNifEnv* env, yaml_event_t* event) {
         env,
         utils_get_atom(env, "scalar"),
         utils_chars_to_binary(env, value, length),
-        utils_nullable_chars_to_binary(env, tag),
         utils_nullable_chars_to_binary(env, anchor),
+        utils_nullable_chars_to_binary(env, tag),
         utils_scalar_style_to_atom(env, event->data.scalar.style)
     );
 }

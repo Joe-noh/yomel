@@ -57,7 +57,7 @@ defmodule Yomel.Decoder do
     decode_seq(%Y{yaml | events: rest}, tag)
   end
 
-  defp do_decode(yaml = %Y{events: [{:scalar, value, _tag, _anchor, _style} | rest]}) do
+  defp do_decode(yaml = %Y{events: [{:scalar, value, _anchor, tag, _style} | rest]}) do
     {value, %Y{yaml | events: rest}}
   end
 

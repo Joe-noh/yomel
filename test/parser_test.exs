@@ -8,6 +8,45 @@ defmodule ParserTest do
     assert actual == expected
   end
 
+  test "parsing int tagged scalar" do
+    actual = parse_and_unpack("!!int 3")
+    expected = [{:scalar, "3", nil, "tag:yaml.org,2002:int", :plain}]
+    assert actual == expected
+  end
+
+  test "parsing str tagged scalar" do
+    actual = parse_and_unpack("!!str 3")
+    expected = [{:scalar, "3", nil, "tag:yaml.org,2002:str", :plain}]
+    assert actual == expected
+  end
+
+  test "parsing float tagged scalar" do
+    actual = parse_and_unpack("!!float 3")
+    expected = [{:scalar, "3", nil, "tag:yaml.org,2002:float", :plain}]
+    assert actual == expected
+  end
+
+  test "parsing seq tagged sequence" do
+    actual = parse_and_unpack("!!seq [1]")
+    expected = [
+      {:sequence_start, nil, "tag:yaml.org,2002:seq", :flow},
+      {:scalar, "1", nil, nil, :plain},
+      :sequence_end
+    ]
+    assert actual == expected
+  end
+
+  test "parsing map tagged mapping" do
+    actual = parse_and_unpack("!!map {k: v}")
+    expected = [
+      {:mapping_start, nil, "tag:yaml.org,2002:map", :flow},
+      {:scalar, "k", nil, nil, :plain},
+      {:scalar, "v", nil, nil, :plain},
+      :mapping_end
+    ]
+    assert actual == expected
+  end
+
   test "parsing sequence" do
     actual = parse_and_unpack("- a")
     expected = [
