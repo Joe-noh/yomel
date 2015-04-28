@@ -4,45 +4,68 @@ defmodule YomelTest do
   test "the truth" do
     input = """
     ---
-    receipt:     Oz-Ware Purchase Invoice
-    date:        2007-08-06
-    customer:
-        given:   Dorothy
-        family:  Gale
-
-    items:
-        - part_no:   A4786
-          descrip:   Water Bucket (Filled)
-          price:     1.47
-          quantity:  4
-
-        - part_no:   E1628
-          descrip:   High Heeled "Ruby" Slippers
-          size:      8
-          price:     100.27
-          quantity:  1
-
-    bill_to:  &id001
-        street: |
-                123 Tornado Alley
-                Suite 16
-        city:   East Centerville
-        state:  KS
-
-    ship_to:  *id001
-
-    specialDelivery:  >
-        Follow the Yellow Brick
-        Road to the Emerald City.
-        Pay no attention to the
-        man behind the curtain.
-    ...
+    invoice: 34843
+    date   : 2001-01-23
+    bill-to: &id001
+        given  : Chris
+        family : Dumars
+        address:
+            lines: |
+                458 Walkman Dr.
+                Suite #292
+            city    : Royal Oak
+            state   : MI
+            postal  : 48046
+    ship-to: *id001
+    product:
+        - sku         : BL394D
+          quantity    : 4
+          description : Basketball
+          price       : 450.00
+        - sku         : BL4438H
+          quantity    : 1
+          description : Super Hoop
+          price       : 2392.00
+    tax  : 251.42
+    total: 4443.52
+    comments: >
+        Late afternoon is best.
+        Backup contact is Nancy
+        Billsmer @ 338-4338.
     """
 
-    events = Yomel.Parser.event_stream(input) |> Enum.to_list
+    bill_to = %{
+      "given" => "Chris",
+      "family" => "Dumars",
+      "address" => %{
+        "lines" => "458 Walkman Dr.\nSuite #292\n",
+        "city" => "Royal Oak",
+        "state" => "MI",
+        "postal" => 48046
+      }
+    }
 
-    assert is_list(events)
-    assert Enum.count(events) > 20
-    assert [:stream_start, :document_start | _] = events
+    expected = [%{
+      "invoice" => 34843,
+      "date" => "2001-01-23",
+      "bill-to" => bill_to,
+      "ship-to" => bill_to,
+      "product" => [
+        %{"sku"         => "BL394D",
+          "quantity"    => 4,
+          "description" => "Basketball",
+          "price"       => 450.00},
+        %{"sku"         => "BL4438H",
+          "quantity"    => 1,
+          "description" => "Super Hoop",
+          "price"       => 2392.00}],
+      "tax"  => 251.42,
+      "total" => 4443.52,
+      "comments" => "Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.\n"
+    }]
+
+    {:ok, yaml} = Yomel.decode(input)
+
+    assert yaml == expected
   end
 end

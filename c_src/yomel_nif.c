@@ -31,34 +31,33 @@ static void yomel_libyaml_destructor(ErlNifEnv* env, void* obj) {
     yaml_event_delete(&yaml->event);
 }
 
-static ERL_NIF_TERM yomel_initialize(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    yomel_libyaml* yaml = enif_alloc_resource(yomel_libyaml_type, sizeof(yomel_libyaml));
-
-    yaml_parser_initialize(&yaml->parser);
-    return enif_make_resource(env, yaml);
-}
-
-static ERL_NIF_TERM yomel_input_string(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    yomel_libyaml* yaml;
-    enif_get_resource(env, argv[0], yomel_libyaml_type, (void**)&yaml);
+static ERL_NIF_TERM yomel_parse_string(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+    yaml_parser_t parser;
+    yaml_event_t event;
+    yaml_parser_initialize(&parser);
 
     ErlNifBinary bin;
-    enif_inspect_binary(env, argv[1], &bin);
+    enif_inspect_binary(env, argv[0], &bin);
 
-    yaml_parser_set_input_string(&yaml->parser, bin.data, bin.size);
+    yaml_parser_set_input_string(&parser, bin.data, bin.size);
 
-    return enif_make_resource(env, yaml);
-}
+    int go_on_parsing = 1;
+    ERL_NIF_TERM list = enif_make_list(env, 0);
+    do {
+        if (!yaml_parser_parse(&parser, &event)) {
+            return list;
+        }
+        list = enif_make_list_cell(env, handle_event(env, &event), list);
 
-static ERL_NIF_TERM yomel_next_event(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    yomel_libyaml* yaml;
-    enif_get_resource(env, argv[0], yomel_libyaml_type, (void**)&yaml);
+        if (event.type == YAML_STREAM_END_EVENT) {
+            go_on_parsing = 0;
+        }
+        yaml_event_delete(&event);
+    } while(go_on_parsing);
 
-    if (!yaml_parser_parse(&yaml->parser, &yaml->event)) {
-        return utils_get_atom(env, "halt");
-    }
+    yaml_parser_delete(&parser);
 
-    return handle_event(env, &yaml->event);
+    return list;
 }
 
 static ERL_NIF_TERM handle_event(ErlNifEnv* env, yaml_event_t* event) {
@@ -160,26 +159,15 @@ static ERL_NIF_TERM handle_scalar_event(ErlNifEnv* env, yaml_event_t* event) {
         env,
         utils_get_atom(env, "scalar"),
         utils_chars_to_binary(env, value, length),
-        utils_nullable_chars_to_binary(env, tag),
         utils_nullable_chars_to_binary(env, anchor),
+        utils_nullable_chars_to_binary(env, tag),
         utils_scalar_style_to_atom(env, event->data.scalar.style)
     );
 }
 
-static int on_load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info) {
-    yomel_libyaml_type = enif_open_resource_type(
-        env, "Elixir.Yomel.Parser", "yomel_libyaml_type",
-        yomel_libyaml_destructor, ERL_NIF_RT_CREATE, NULL
-    );
-
-    return 0;
-}
-
 static ErlNifFunc nif_functions[] = {
-    {"initialize", 0, yomel_initialize},
-    {"input_string", 2, yomel_input_string},
-    {"next_event", 1, yomel_next_event}
+    {"nif_parse_string", 1, yomel_parse_string}
 };
 
-ERL_NIF_INIT(Elixir.Yomel.Parser, nif_functions, on_load, 0, 0, NULL);
+ERL_NIF_INIT(Elixir.Yomel.Parser, nif_functions, 0, 0, 0, NULL);
 
