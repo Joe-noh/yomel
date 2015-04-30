@@ -7,4 +7,11 @@ defmodule Yomel do
     |> Parser.parse_string
     |> Decoder.decode
   end
+
+  def decode_file(path) do
+    path
+    |> File.read!
+    |> Parser.parse_string
+    |> Decoder.decode
+  end
 end
