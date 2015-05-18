@@ -46,7 +46,10 @@ defmodule Yomel.Mixfile do
     [applications: [:logger]]
   end
 
-  defp deps, do: []
+  defp deps do
+    [{:earmark, "~> 0.1", only: :dev},
+     {:ex_doc,  "~> 0.7", only: :dev}]
+  end
 
   defp description do
     "Decodes yaml into elixir terms"
