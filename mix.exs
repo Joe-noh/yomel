@@ -39,7 +39,8 @@ defmodule Yomel.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      compilers: [:nif | Mix.compilers],
-     deps: deps]
+     deps: deps,
+     docs: docs]
   end
 
   def application do
@@ -62,5 +63,9 @@ defmodule Yomel.Mixfile do
      links: %{
        "GitHub" => "https://github.com/Joe-noh/yomel"
      }]
+  end
+
+  defp docs do
+    [readme: "README.md", main: "README"]
   end
 end
