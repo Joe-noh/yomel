@@ -4,17 +4,16 @@ libyaml interface for elixir.
 
 ## Usage
 
-### Decoding
+Currently this only supports decoding.
 
 ```elixir
-iex> yaml = """
-...> ---
-...> number: 100
-...> name: John
-...> """
+yaml = """
+---
+number: 100
+name: John
+"""
 
-iex> Yomel.decode(yaml)
-{:ok, [%{"number" => 100, "name" => "John"}]}
+Yomel.decode(yaml) #=> {:ok, [%{"number" => 100, "name" => "John"}]}
 
-iex> Yomel.decode_file("./example.yaml")
+Yomel.decode_file("./example.yaml")
 ```
