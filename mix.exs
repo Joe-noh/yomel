@@ -1,15 +1,17 @@
 defmodule Mix.Tasks.Compile.Nif do
   use Mix.Task
 
-  @shortdoc "compile c_src/*.c"
+  @shortdoc "compile C source"
 
   @compiler "clang"
   @erl_flag "-I#{:code.root_dir}/erts-#{:erlang.system_info :version}/include"
-  @c_files  Path.wildcard("c_src/*.c")
-  @out_opt  "-o priv/yomel.so"
+  @c_files  [__DIR__, "c_src", "*.c"] |> Path.join |> Path.wildcard
+  @out_opt  "-o #{Path.join [__DIR__, "priv", "yomel.so"]}"
 
   def run(_) do
-    File.mkdir_p!("priv")
+    [__DIR__, "priv"]
+    |> Path.join
+    |> File.mkdir_p!
 
     [@compiler, @erl_flag, @c_files, shared_opts, @out_opt]
     |> List.flatten
