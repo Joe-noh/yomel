@@ -2,7 +2,11 @@ defmodule Yomel.Parser do
   @on_load {:init, 0}
 
   def init do
-    :erlang.load_nif('priv/yomel', 0)
+    [__DIR__, ~w[.. .. priv yomel]]
+    |> List.flatten
+    |> Path.join
+    |> String.to_char_list
+    |> :erlang.load_nif(0)
   end
 
   defmacrop nif do
