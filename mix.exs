@@ -1,30 +1,14 @@
-defmodule Mix.Tasks.Compile.Nif do
-  use Mix.Task
-
-  @shortdoc "compile C source"
-
-  @compiler "clang"
-  @erl_flag "-I#{:code.root_dir}/erts-#{:erlang.system_info :version}/include"
-  @c_files  [__DIR__, "c_src", "*.c"] |> Path.join |> Path.wildcard
-  @out_opt  "-o #{Path.join [__DIR__, "priv", "yomel.so"]}"
+defmodule Mix.Tasks.Compile.Yaml do
+  @shortdoc "Compiles libyaml"
 
   def run(_) do
-    [__DIR__, "priv"]
-    |> Path.join
-    |> File.mkdir_p!
-
-    [@compiler, @erl_flag, @c_files, shared_opts, @out_opt]
-    |> List.flatten
-    |> Enum.join(" ")
-    |> Mix.shell.cmd
-  end
-
-  defp shared_opts, do: ["-shared" | os_shared_opts]
-
-  defp os_shared_opts do
-    case :os.type do
-      {:unix, :darwin} -> ~w(-dynamiclib -undefined dynamic_lookup -lyaml)
-      _other -> []
+    # TODO: Totally untested
+    if match? {:win32, _}, :os.type do
+      raise RuntimeError, message: "Compiling on windows is not currently supported"
+    else
+      {result, _error_code} = System.cmd("make", ["priv/yomel.so"], stderr_to_stdout: true)
+      IO.binwrite result
+      :ok
     end
   end
 end
@@ -35,12 +19,12 @@ defmodule Yomel.Mixfile do
   def project do
     [app: :yomel,
      version: "0.2.2",
-     elixir: "~> 1.0",
+     elixir: "~> 1.2.0",
      description: description,
      package: package,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     compilers: [:nif | Mix.compilers],
+     compilers: [:yaml, :elixir, :app],
      deps: deps,
      docs: docs]
   end
@@ -51,7 +35,8 @@ defmodule Yomel.Mixfile do
 
   defp deps do
     [{:earmark, "~> 0.1", only: :dev},
-     {:ex_doc,  "~> 0.7", only: :dev}]
+     {:ex_doc,  "~> 0.7", only: :dev},
+     {:yaml, git: "git@github.com:yaml/libyaml.git", tag: "0.1.4", app: false, compile: "./bootstrap && ./configure"}]
   end
 
   defp description do
