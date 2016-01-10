@@ -44,7 +44,7 @@ defmodule Yomel.Mixfile do
   end
 
   defp package do
-    [files: ["lib", "priv", "c_src", "mix.exs", "README*", "LICENSE*"],
+    [files: ["lib", "c_src", "mix.exs", "Makefile", "README*", "LICENSE*"],
      maintainers: ["Joe Honzawa"],
      licenses: ["MIT"],
      links: %{
