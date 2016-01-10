@@ -18,7 +18,7 @@ defmodule Yomel.Mixfile do
 
   def project do
     [app: :yomel,
-     version: "0.2.2",
+     version: "0.3.0",
      elixir: "~> 1.2.0",
      description: description,
      package: package,
@@ -34,8 +34,8 @@ defmodule Yomel.Mixfile do
   end
 
   defp deps do
-    [{:earmark, "~> 0.1", only: :dev},
-     {:ex_doc,  "~> 0.7", only: :dev},
+    [{:earmark, "~> 0.2", only: :dev},
+     {:ex_doc,  "~> 0.11", only: :dev},
      {:yaml, git: "git@github.com:yaml/libyaml.git", tag: "0.1.4", app: false, compile: "./bootstrap && ./configure"}]
   end
 
