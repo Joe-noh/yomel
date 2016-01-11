@@ -1,15 +1,17 @@
-defmodule Mix.Tasks.Compile.Yaml do
-  @shortdoc "Compiles libyaml"
+defmodule Mix.Tasks.Compile.Nif do
+  use Mix.Task
+
+  @shortdoc "compile C source"
 
   def run(_) do
-    # TODO: Totally untested
     if match? {:win32, _}, :os.type do
-      raise RuntimeError, message: "Compiling on windows is not currently supported"
+      raise RuntimeError, message: "Windows is not currently supported"
     else
       {result, _error_code} = System.cmd("make", ["priv/yomel.so"], stderr_to_stdout: true)
       IO.binwrite result
-      :ok
     end
+
+    :ok
   end
 end
 
@@ -18,13 +20,13 @@ defmodule Yomel.Mixfile do
 
   def project do
     [app: :yomel,
-     version: "0.3.0",
-     elixir: "~> 1.2.0",
+     version: "0.4.0",
+     elixir: "~> 1.0",
      description: description,
      package: package,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     compilers: [:yaml, :elixir, :app],
+     compilers: [:nif | Mix.compilers],
      deps: deps,
      docs: docs]
   end
@@ -34,9 +36,8 @@ defmodule Yomel.Mixfile do
   end
 
   defp deps do
-    [{:earmark, "~> 0.2", only: :dev},
-     {:ex_doc,  "~> 0.11", only: :dev},
-     {:yaml, github: "yaml/libyaml", tag: "0.1.4", app: false, compile: "./bootstrap && ./configure"}]
+    [{:earmark, "~> 0.1", only: :dev},
+     {:ex_doc,  "~> 0.7", only: :dev}]
   end
 
   defp description do
