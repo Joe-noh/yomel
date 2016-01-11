@@ -45,7 +45,7 @@ defmodule Yomel.Mixfile do
 
   defp package do
     [files: ["lib", "priv", "c_src", "mix.exs", "README*", "LICENSE*"],
-     maintainers: ["Joe Honzawa"],
+     contributors: ["Joe Honzawa"],
      licenses: ["MIT"],
      links: %{
        "GitHub" => "https://github.com/Joe-noh/yomel"
