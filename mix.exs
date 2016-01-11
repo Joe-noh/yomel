@@ -36,7 +36,7 @@ defmodule Yomel.Mixfile do
   defp deps do
     [{:earmark, "~> 0.2", only: :dev},
      {:ex_doc,  "~> 0.11", only: :dev},
-     {:yaml, git: "git@github.com:yaml/libyaml.git", tag: "0.1.4", app: false, compile: "./bootstrap && ./configure"}]
+     {:yaml, github: "yaml/libyaml", tag: "0.1.4", compile: "./bootstrap && ./configure"}]
   end
 
   defp description do
