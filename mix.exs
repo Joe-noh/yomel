@@ -10,7 +10,7 @@ defmodule Mix.Tasks.Compile.Nif do
       {result, _error_code} = System.cmd("make", ["priv/yomel.so"], stderr_to_stdout: true)
       IO.binwrite result
     end
-    
+
     :ok
   end
 end
@@ -20,7 +20,7 @@ defmodule Yomel.Mixfile do
 
   def project do
     [app: :yomel,
-     version: "0.2.2",
+     version: "0.4.0",
      elixir: "~> 1.0",
      description: description,
      package: package,
@@ -45,8 +45,8 @@ defmodule Yomel.Mixfile do
   end
 
   defp package do
-    [files: ["lib", "priv", "c_src", "mix.exs", "README*", "LICENSE*"],
-     contributors: ["Joe Honzawa"],
+    [files: ["lib", "c_src", "mix.exs", "Makefile", "README*", "LICENSE*"],
+     maintainers: ["Joe Honzawa"],
      licenses: ["MIT"],
      links: %{
        "GitHub" => "https://github.com/Joe-noh/yomel"
